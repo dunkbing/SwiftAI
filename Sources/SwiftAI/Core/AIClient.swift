@@ -34,38 +34,28 @@ public class AIClient {
         return newProvider
     }
 
-    /// Generates a complete text response using the specified provider.
+    /// Generates a complete text response using the specified model.
     public func generateText(
-        provider type: ProviderType,
-        model: String? = nil, // use default if nil
+        model: AIModel,
         messages: [ChatMessage],
         options: RequestOptions? = nil
     ) async throws -> String {
-        let provider = try getProvider(type: type)
-        let targetModel = model ?? configuration.defaultModel?[type] ?? ""
-        if targetModel.isEmpty {
-            throw AIError.configurationError("Model must be specified either in the call or in the configuration for \(type).")
-        }
+        let provider = try getProvider(type: model.providerType)
         let mergedOptions = mergeOptions(callOptions: options, configOptions: configuration.defaultOptions)
 
-        return try await provider.generateText(model: targetModel, messages: messages, options: mergedOptions)
+        return try await provider.generateText(model: model.modelString, messages: messages, options: mergedOptions)
     }
 
-    /// Generates a streamed text response using the specified provider.
+    /// Generates a streamed text response using the specified model.
     public func streamText(
-        provider type: ProviderType,
-        model: String? = nil,
+        model: AIModel,
         messages: [ChatMessage],
         options: RequestOptions? = nil
     ) async throws -> AsyncThrowingStream<AIStreamChunk, Error> {
-        let provider = try getProvider(type: type)
-        let targetModel = model ?? configuration.defaultModel?[type] ?? "" // Provider should handle empty model if it has a default
-         if targetModel.isEmpty {
-            throw AIError.configurationError("Model must be specified either in the call or in the configuration for \(type).")
-        }
-       let mergedOptions = mergeOptions(callOptions: options, configOptions: configuration.defaultOptions)
+        let provider = try getProvider(type: model.providerType)
+        let mergedOptions = mergeOptions(callOptions: options, configOptions: configuration.defaultOptions)
 
-        return try await provider.streamText(model: targetModel, messages: messages, options: mergedOptions)
+        return try await provider.streamText(model: model.modelString, messages: messages, options: mergedOptions)
     }
 
     // Helper to merge request options

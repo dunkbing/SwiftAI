@@ -18,11 +18,8 @@ guard let validDeepSeekKey = deepSeekAPIKey, !validDeepSeekKey.isEmpty else {
 let config = AIConfiguration(
     apiKeys: [
         .deepSeek: validDeepSeekKey,
+        // Uncomment if you have an OpenAI key
         // .openAI: openAIAPIKey ?? ""
-    ],
-    defaultModel: [
-        .deepSeek: "deepseek-chat",
-        // .openAI: "gpt-4o"
     ],
     defaultOptions: RequestOptions(temperature: 0.7)
 )
@@ -43,12 +40,11 @@ Task {
     // --- Generate Text (DeepSeek) ---
     print("\n💬 Requesting Full Text Generation (DeepSeek)...")
     do {
-        // Using the default model specified in config ("deepseek-chat")
+        // Using the new AIModel enum
         let deepSeekResponse = try await aiClient.generateText(
-            provider: .deepSeek,
+            model: .deepSeek("deepseek-chat"),
             messages: messages
-            // override model or options here:
-            // model: "deepseek-coder",
+            // override options here:
             // options: RequestOptions(temperature: 0.5)
         )
         print("\n✅ DeepSeek Full Response:\n\(deepSeekResponse)")
@@ -66,10 +62,9 @@ Task {
     // --- Stream Text (DeepSeek) ---
     print("\n\n🌊 Requesting Text Streaming (DeepSeek)...")
     do {
-        // Using a specific model this time (check DeepSeek docs for available models)
+        // Using the predefined constant from AIModel
         let deepSeekStream = try await aiClient.streamText(
-            provider: .deepSeek,
-            model: "deepseek-chat", // Or another model like deepseek-coder
+            model: .deepSeekChat,
             messages: messages
         )
         print("\n✅ DeepSeek Streaming Response:")
